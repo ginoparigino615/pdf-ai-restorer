@@ -1,0 +1,7 @@
+services:
+  pdf-restorer:
+    build: .
+    ports: ["8000:8000"]
+    volumes: ["pdfdata:/app/data"]
+volumes:
+  pdfdata:

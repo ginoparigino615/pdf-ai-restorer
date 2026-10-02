@@ -1,0 +1,10 @@
+let jid=null,sel=new Set(),timer=null;const $=x=>document.getElementById(x);
+$("create").onclick=async()=>{let f=$("file").files[0];if(!f)return alert("Seleziona un PDF.");let fd=new FormData();fd.append("file",f);let r=await fetch("/api/jobs",{method:"POST",body:fd}),j=await r.json();if(!r.ok)return alert(j.detail||"Errore");jid=j.id;$("progressCard").classList.remove("hidden");$("reviewCard").classList.remove("hidden");$("jobinfo").textContent=`Progetto ${j.id} • ${j.total} pagine`;$("to").value=j.total;poll()};
+$("start").onclick=()=>fetch(`/api/jobs/${jid}/start`,{method:"POST"}).then(poll);
+$("pause").onclick=()=>fetch(`/api/jobs/${jid}/pause`,{method:"POST"});
+$("addRange").onclick=()=>{let a=+$("from").value,b=+$("to").value;if(a>b)[a,b]=[b,a];for(let i=a;i<=b;i++)sel.add(i);draw()};
+$("addSingle").onclick=()=>{($("single").value.match(/\d+/g)||[]).forEach(x=>sel.add(+x));draw()};
+$("ai").onclick=async()=>{if(!sel.size)return alert("Seleziona almeno una pagina.");let pages=[...sel].sort((a,b)=>a-b);let r=await fetch(`/api/jobs/${jid}/ai`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pages})}),j=await r.json();$("queue").textContent=j.message+" • "+pages.join(", ")};
+function draw(){$("selected").innerHTML=[...sel].sort((a,b)=>a-b).map(n=>`<span class="tag">${n}</span>`).join("")}
+function poll(){clearInterval(timer);timer=setInterval(async()=>{let j=await (await fetch(`/api/jobs/${jid}`)).json(),pct=j.total?Math.round(j.current/j.total*100):0;$("bar").style.width=pct+"%";$("progressText").textContent=`${j.current} / ${j.total} • ${j.status}`;if(j.status==="done"){clearInterval(timer);$("download").classList.remove("hidden");$("download").href=`/api/jobs/${jid}/download`;drawReview(j)}} ,1200)}
+function drawReview(j){let h="";for(let [n,p] of Object.entries(j.pages||{}))h+=`<div class="card ${p.label}"><b>Pagina ${n}</b> • qualità indicativa ${p.score}/100 • ${p.label==="good"?"OK":p.label==="review"?"Da controllare":"AI consigliata"}</div>`;$("review").innerHTML=h}
