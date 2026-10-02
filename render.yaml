@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: pdf-ai-restorer-v2
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /
+    envVars:
+      - key: B2_ENDPOINT
+        sync: false
+      - key: B2_KEY_ID
+        sync: false
+      - key: B2_APPLICATION_KEY
+        sync: false
+      - key: B2_BUCKET
+        sync: false
+      - key: CHECKPOINT_EVERY
+        value: "10"

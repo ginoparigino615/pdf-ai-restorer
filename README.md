@@ -1,25 +1,24 @@
-# PDF AI Restorer Web
+# PDF AI Restorer — Render Free v2
 
-## Funzioni
-- upload PDF
-- elaborazione pagina per pagina
-- denoise, contrasto e nitidezza moderata
-- OCR italiano + inglese
-- PDF con testo selezionabile
-- classificazione indicativa delle pagine
-- selezione di singole pagine o intervalli
-- coda per interventi AI selettivi
+Versione più veloce e conservativa.
 
-## AI
-La coda AI è predisposta, ma questa versione NON scarica automaticamente modelli pesanti e non nasconde chiamate esterne. Il prossimo collegamento può usare un model server GPU o un provider esterno.
+## Cosa fa
+- mantiene il colore originale delle scansioni;
+- renderizza a 160 DPI di default per ridurre i tempi sul piano Free;
+- correzione conservativa di illuminazione/contrasto;
+- denoise leggero solo quando utile;
+- sharpening leggero;
+- deskew;
+- OCR Tesseract con coordinate delle parole;
+- PDF ricercabile/selezionabile con testo invisibile;
+- valutazione indicativa della qualità pagina;
+- selezione manuale di pagine/intervalli;
+- secondo passaggio di miglioramento sulle pagine selezionate;
+- checkpoint periodici;
+- storage B2 opzionale per recupero dopo riavvio.
 
-## Avvio con Docker
-docker build -t pdf-ai-restorer .
-docker run -p 8000:8000 -v pdfdata:/app/data pdf-ai-restorer
+## Nota
+La selezione "AI" di questa versione non è ancora un modello generativo/super-resolution GPU: è un secondo passaggio conservativo OpenCV. La vera AI selettiva può essere aggiunta successivamente.
 
-Poi apri http://localhost:8000.
-
-## Per 700–800 pagine
-In produzione servono storage persistente e una coda worker. Il progetto salva lo stato delle pagine, quindi l'architettura è già pensata per la ripresa.
-
-Non disabilitare antivirus o protezioni del computer.
+## Deploy
+Su Render: Docker + Free. Il servizio usa il filesystem temporaneo di Render; per lavori lunghi configura Backblaze B2.
